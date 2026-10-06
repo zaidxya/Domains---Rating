@@ -1,32 +1,21 @@
 const express = require('express');
-const Database = require('better-sqlite3');
+const { Pool } = require('pg');
 const path = require('path');
 const crypto = require('crypto');
 
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  console.error('DATABASE_URL is not set. Paste your Postgres connection string into it.');
+  process.exit(1);
+}
+
+// Hosted databases need SSL; a local one on your own machine does not
+const isLocal = /localhost|127\.0\.0\.1/.test(DATABASE_URL);
+const pool = new Pool({ connectionString: DATABASE_URL, ssl: isLocal ? false : true });
+
 const app = express();
-const db = new Database(path.join(__dirname, 'ratings.db'));
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS ratings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    university TEXT,
-    overall INTEGER NOT NULL CHECK (overall BETWEEN 1 AND 5),
-    study_zone INTEGER CHECK (study_zone BETWEEN 1 AND 5),
-    courses INTEGER CHECK (courses BETWEEN 1 AND 5),
-    comment TEXT,
-    lang TEXT,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-  )
-`);
-
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-
-const insert = db.prepare(`
-  INSERT INTO ratings (name, university, overall, study_zone, courses, comment, lang)
-  VALUES (@name, @university, @overall, @study_zone, @courses, @comment, @lang)
-`);
 
 const star = v => {
   const n = Number(v);
@@ -34,34 +23,44 @@ const star = v => {
 };
 const text = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '') || null;
 
-app.post('/api/ratings', (req, res) => {
+// ---------- Public: submit a rating ----------
+app.post('/api/ratings', async (req, res) => {
   const b = req.body || {};
   const overall = star(b.overall);
   if (!overall) return res.status(400).json({ error: 'overall rating (1-5) is required' });
 
-  insert.run({
-    name: text(b.name, 80),
-    university: text(b.university, 120),
-    overall,
-    study_zone: star(b.study_zone),
-    courses: star(b.courses),
-    comment: text(b.comment, 1000),
-    lang: b.lang === 'ar' ? 'ar' : 'en'
-  });
-  res.status(201).json({ ok: true });
+  try {
+    await pool.query(
+      `INSERT INTO ratings (name, university, overall, study_zone, courses, comment, lang)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        text(b.name, 80), text(b.university, 120), overall,
+        star(b.study_zone), star(b.courses), text(b.comment, 1000),
+        b.lang === 'ar' ? 'ar' : 'en'
+      ]
+    );
+    res.status(201).json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'could not save rating' });
+  }
 });
 
-app.get('/api/stats', (req, res) => {
-  const row = db.prepare(`
-    SELECT COUNT(*) AS count,
-           ROUND(AVG(overall), 2) AS overall,
-           ROUND(AVG(study_zone), 2) AS study_zone,
-           ROUND(AVG(courses), 2) AS courses
-    FROM ratings
-  `).get();
-  res.json(row);
-});
+const STATS_SQL = `
+  SELECT COUNT(*)::int AS count,
+         ROUND(AVG(overall)::numeric, 2)::float AS overall,
+         ROUND(AVG(study_zone)::numeric, 2)::float AS study_zone,
+         ROUND(AVG(courses)::numeric, 2)::float AS courses
+  FROM ratings`;
 
+app.get('/api/stats', async (req, res) => {
+  try {
+    res.json((await pool.query(STATS_SQL)).rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'could not load stats' });
+  }
+});
 
 // ---------- Admin dashboard (password protected) ----------
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
@@ -85,22 +84,45 @@ function requireAdmin(req, res, next) {
 
 app.use('/admin', requireAdmin);
 
-app.get('/admin/api/ratings', (req, res) => {
-  res.json(db.prepare('SELECT * FROM ratings ORDER BY id DESC').all());
+app.get('/admin/api/ratings', async (req, res) => {
+  try {
+    res.json((await pool.query('SELECT * FROM ratings ORDER BY id DESC')).rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'could not load ratings' });
+  }
 });
 
-app.get('/admin/api/stats', (req, res) => {
-  res.json(db.prepare(`
-    SELECT COUNT(*) AS count,
-           ROUND(AVG(overall), 2) AS overall,
-           ROUND(AVG(study_zone), 2) AS study_zone,
-           ROUND(AVG(courses), 2) AS courses
-    FROM ratings`).get());
+app.get('/admin/api/stats', async (req, res) => {
+  try {
+    res.json((await pool.query(STATS_SQL)).rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'could not load stats' });
+  }
 });
 
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Running on http://localhost:${PORT}`));
+// ---------- Start: make sure the table exists, then listen ----------
+async function start() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ratings (
+      id SERIAL PRIMARY KEY,
+      name TEXT,
+      university TEXT,
+      overall INTEGER NOT NULL CHECK (overall BETWEEN 1 AND 5),
+      study_zone INTEGER CHECK (study_zone BETWEEN 1 AND 5),
+      courses INTEGER CHECK (courses BETWEEN 1 AND 5),
+      comment TEXT,
+      lang TEXT,
+      created_at TIMESTAMPTZ DEFAULT now()
+    )`);
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => console.log(`Running on http://localhost:${PORT}`));
+}
 
-// Hello
+start().catch(err => {
+  console.error('Could not start:', err.message);
+  process.exit(1);
+});
