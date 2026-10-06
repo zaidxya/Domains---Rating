@@ -65,12 +65,12 @@ document.getElementById('form').onsubmit = async e => {
     const r = await fetch('/api/ratings', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
     });
-    if (!r.ok) throw new Error('Server replied ' + r.status);
+    if (!r.ok) throw new Error();
     msg.textContent = T[lang].thanks;
     f.reset();
     Object.keys(values).forEach(k => values[k] = 0);
     document.querySelectorAll('.stars button').forEach(s => s.classList.remove('on'));
-   } catch (err) { console.error(err); msg.textContent = T[lang].error; }
+  } catch { msg.textContent = T[lang].error; }
 };
 
 applyLang();

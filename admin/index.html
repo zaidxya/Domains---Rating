@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domains ratings</title>
+<style>
+  :root { --bg:#f4f6fa; --card:#fff; --text:#1c2333; --muted:#6b7385; --accent:#2f5bea; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#12151d; --card:#1b2030; --text:#eef1f8; --muted:#9aa3b8; } }
+  body { margin:0; font-family:system-ui,"Segoe UI",Tahoma,sans-serif; background:var(--bg); color:var(--text); }
+  main { max-width:1000px; margin:1.5rem auto; padding:0 1rem; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.75rem; }
+  .stat { background:var(--card); border-radius:12px; padding:1rem; text-align:center; }
+  .stat b { display:block; font-size:1.8rem; color:var(--accent); }
+  .stat span { color:var(--muted); font-size:.9rem; }
+  .bar { display:flex; gap:.5rem; margin:1rem 0; }
+  .bar input, .bar select { padding:.5rem; border-radius:8px; border:1px solid var(--muted); background:var(--card); color:inherit; font:inherit; }
+  .bar input { flex:1; }
+  .wrap { overflow-x:auto; background:var(--card); border-radius:12px; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { padding:.6rem .75rem; text-align:start; border-bottom:1px solid rgba(128,128,128,.2); vertical-align:top; }
+  th { color:var(--muted); font-size:.85rem; }
+  td.comment { min-width:240px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Domains ratings</h1>
+  <div class="stats" id="stats"></div>
+  <div class="bar">
+    <input id="q" placeholder="Search name, university, comment...">
+    <select id="min">
+      <option value="0">All ratings</option>
+      <option value="4">4★ and up</option>
+      <option value="1">1★ to 2★ only</option>
+    </select>
+  </div>
+  <div class="wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Name</th><th>University</th><th>Overall</th><th>Study zone</th><th>Courses</th><th>Comment</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</main>
+<script>
+let all = [];
+
+async function load() {
+  const [stats, rows] = await Promise.all([
+    fetch('api/stats').then(r => r.json()),
+    fetch('api/ratings').then(r => r.json())
+  ]);
+  all = rows;
+  const box = document.getElementById('stats');
+  box.innerHTML = '';
+  [['Ratings', stats.count], ['Overall avg', stats.overall ?? '-'],
+   ['Study zone avg', stats.study_zone ?? '-'], ['Courses avg', stats.courses ?? '-']]
+    .forEach(([label, val]) => {
+      const d = document.createElement('div');
+      d.className = 'stat';
+      const b = document.createElement('b'); b.textContent = val;
+      const s = document.createElement('span'); s.textContent = label;
+      d.append(b, s);
+      box.appendChild(d);
+    });
+  render();
+}
+
+function render() {
+  const q = document.getElementById('q').value.toLowerCase();
+  const m = document.getElementById('min').value;
+  const tbody = document.getElementById('rows');
+  tbody.innerHTML = '';
+  all.filter(r => {
+    if (m === '4' && r.overall < 4) return false;
+    if (m === '1' && r.overall > 2) return false;
+    return !q || [r.name, r.university, r.comment].some(v => (v || '').toLowerCase().includes(q));
+  }).forEach(r => {
+    const tr = document.createElement('tr');
+    [r.created_at, r.name, r.university, r.overall, r.study_zone, r.courses, r.comment].forEach((v, i) => {
+      const td = document.createElement('td');
+      td.textContent = v ?? '-';          // textContent = comments can't inject HTML
+      if (i === 6) { td.className = 'comment'; td.dir = 'auto'; }  // Arabic comments align correctly
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById('q').oninput = render;
+document.getElementById('min').onchange = render;
+load();
+</script>
+</body>
+</html>
