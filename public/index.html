@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rate Domains</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card">
+    <button id="langBtn" type="button" class="lang">العربية</button>
+    <h1 data-i18n="title"></h1>
+    <p class="sub" data-i18n="subtitle"></p>
+
+    <form id="form">
+      <label><span data-i18n="name"></span>
+        <input name="name" maxlength="80">
+      </label>
+      <label><span data-i18n="university"></span>
+        <input name="university" maxlength="120">
+      </label>
+
+      <fieldset><legend data-i18n="overall"></legend><div class="stars" data-name="overall"></div></fieldset>
+      <fieldset><legend data-i18n="studyZone"></legend><div class="stars" data-name="study_zone"></div></fieldset>
+      <fieldset><legend data-i18n="courses"></legend><div class="stars" data-name="courses"></div></fieldset>
+
+      <label><span data-i18n="comment"></span>
+        <textarea name="comment" rows="4" maxlength="1000"></textarea>
+      </label>
+
+      <button type="submit" data-i18n="submit"></button>
+      <p id="msg" role="status"></p>
+    </form>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
