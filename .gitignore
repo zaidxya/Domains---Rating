@@ -1,0 +1,4 @@
+node_modules/
+ratings.db
+ratings.db-*
+.env

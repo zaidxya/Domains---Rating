@@ -1,6 +1,7 @@
 const express = require('express');
 const Database = require('better-sqlite3');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const db = new Database(path.join(__dirname, 'ratings.db'));
@@ -60,6 +61,44 @@ app.get('/api/stats', (req, res) => {
   `).get();
   res.json(row);
 });
+
+
+// ---------- Admin dashboard (password protected) ----------
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+function safeEqual(a, b) {
+  const x = crypto.createHash('sha256').update(a).digest();
+  const y = crypto.createHash('sha256').update(b).digest();
+  return crypto.timingSafeEqual(x, y);
+}
+
+function requireAdmin(req, res, next) {
+  if (!ADMIN_PASSWORD) return res.status(503).send('Admin disabled: ADMIN_PASSWORD is not set');
+  const [scheme, encoded] = (req.headers.authorization || '').split(' ');
+  if (scheme === 'Basic' && encoded) {
+    const decoded = Buffer.from(encoded, 'base64').toString();
+    if (safeEqual(decoded.slice(decoded.indexOf(':') + 1), ADMIN_PASSWORD)) return next();
+  }
+  res.set('WWW-Authenticate', 'Basic realm="Domains admin"');
+  res.status(401).send('Login required');
+}
+
+app.use('/admin', requireAdmin);
+
+app.get('/admin/api/ratings', (req, res) => {
+  res.json(db.prepare('SELECT * FROM ratings ORDER BY id DESC').all());
+});
+
+app.get('/admin/api/stats', (req, res) => {
+  res.json(db.prepare(`
+    SELECT COUNT(*) AS count,
+           ROUND(AVG(overall), 2) AS overall,
+           ROUND(AVG(study_zone), 2) AS study_zone,
+           ROUND(AVG(courses), 2) AS courses
+    FROM ratings`).get());
+});
+
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Running on http://localhost:${PORT}`));
