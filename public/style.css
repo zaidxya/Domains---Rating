@@ -15,4 +15,5 @@ input, textarea { width:100%; padding:.6rem; border:1px solid var(--muted); bord
 .stars button.on { color:var(--star); }
 button[type=submit] { width:100%; padding:.75rem; border:0; border-radius:8px; background:var(--accent); color:#fff; font:inherit; font-weight:600; cursor:pointer; }
 .lang { position:absolute; top:1rem; inset-inline-end:1rem; background:none; border:1px solid var(--muted); color:inherit; border-radius:8px; padding:.3rem .7rem; cursor:pointer; }
+.hp { position:absolute; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none; }
 #msg { min-height:1.5rem; text-align:center; }

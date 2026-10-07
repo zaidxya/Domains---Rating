@@ -6,7 +6,7 @@ const T = {
     overall: 'Overall rating *', studyZone: 'Study zone', courses: 'Free courses',
     comment: 'Your feedback', submit: 'Submit rating',
     needOverall: 'Please give an overall rating.', thanks: 'Thank you for your feedback!',
-    error: 'Something went wrong. Please try again.', other: 'العربية'
+    error: 'Something went wrong. Please try again.', tooMany: 'You have sent several ratings already. Please try again later.', other: 'العربية'
   },
   ar: {
     title: 'قيّم دومينز',
@@ -15,7 +15,7 @@ const T = {
     overall: 'التقييم العام *', studyZone: 'منطقة الدراسة', courses: 'الدورات المجانية',
     comment: 'ملاحظاتك', submit: 'إرسال التقييم',
     needOverall: 'يرجى إدخال التقييم العام.', thanks: 'شكرًا لك على ملاحظاتك!',
-    error: 'حدث خطأ. حاول مرة أخرى.', other: 'English'
+    error: 'حدث خطأ. حاول مرة أخرى.', tooMany: 'لقد أرسلت عدة تقييمات بالفعل. يرجى المحاولة لاحقًا.', other: 'English'
   }
 };
 
@@ -59,13 +59,15 @@ document.getElementById('form').onsubmit = async e => {
   const f = e.target;
   const body = {
     name: f.name.value, university: f.university.value, comment: f.comment.value,
+    website: f.elements.website.value,
     ...values, lang
   };
   try {
     const r = await fetch('/api/ratings', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
     });
-    if (!r.ok) throw new Error();
+    if (r.status === 429) { msg.textContent = T[lang].tooMany; return; }
+    if (!r.ok) throw new Error('Server replied ' + r.status);
     msg.textContent = T[lang].thanks;
     f.reset();
     Object.keys(values).forEach(k => values[k] = 0);

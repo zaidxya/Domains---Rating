@@ -2,6 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const path = require('path');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
@@ -14,6 +15,8 @@ const isLocal = /localhost|127\.0\.0\.1/.test(DATABASE_URL);
 const pool = new Pool({ connectionString: DATABASE_URL, ssl: isLocal ? false : true });
 
 const app = express();
+// Render sits behind one proxy; without this every visitor looks like the same IP
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -23,9 +26,33 @@ const star = v => {
 };
 const text = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '') || null;
 
+// ---------- Spam protection ----------
+// Max 10 ratings per IP per hour (a shared campus IP still has room)
+const ratingLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 10,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'too many ratings, try again later' }
+});
+
+// Max 10 FAILED admin logins per IP per 15 minutes (stops password guessing)
+const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  skipSuccessfulRequests: true,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: 'Too many failed logins. Try again later.'
+});
+
 // ---------- Public: submit a rating ----------
-app.post('/api/ratings', async (req, res) => {
+app.post('/api/ratings', ratingLimiter, async (req, res) => {
   const b = req.body || {};
+  // Honeypot: real people never see this hidden field, bots fill it in
+  if (typeof b.website === 'string' && b.website.trim() !== '') {
+    return res.status(201).json({ ok: true });   // pretend success, save nothing
+  }
   const overall = star(b.overall);
   if (!overall) return res.status(400).json({ error: 'overall rating (1-5) is required' });
 
@@ -82,7 +109,7 @@ function requireAdmin(req, res, next) {
   res.status(401).send('Login required');
 }
 
-app.use('/admin', requireAdmin);
+app.use('/admin', adminLimiter, requireAdmin);
 
 app.get('/admin/api/ratings', async (req, res) => {
   try {
