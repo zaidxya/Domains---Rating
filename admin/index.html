@@ -8,7 +8,7 @@
   :root { --bg:#f4f6fa; --card:#fff; --text:#1c2333; --muted:#6b7385; --accent:#2f5bea; }
   @media (prefers-color-scheme: dark) { :root { --bg:#12151d; --card:#1b2030; --text:#eef1f8; --muted:#9aa3b8; } }
   body { margin:0; font-family:system-ui,"Segoe UI",Tahoma,sans-serif; background:var(--bg); color:var(--text); }
-  main { max-width:1000px; margin:1.5rem auto; padding:0 1rem; }
+  main { max-width:1400px; margin:1.5rem auto; padding:0 1rem; }
   .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.75rem; }
   .stat { background:var(--card); border-radius:12px; padding:1rem; text-align:center; }
   .stat b { display:block; font-size:1.8rem; color:var(--accent); }
@@ -28,7 +28,7 @@
   <h1>Domains ratings</h1>
   <div class="stats" id="stats"></div>
   <div class="bar">
-    <input id="q" placeholder="Search name, university, comment...">
+    <input id="q" placeholder="Search name, phone, email, university, major, comment...">
     <select id="min">
       <option value="0">All ratings</option>
       <option value="4">4★ and up</option>
@@ -37,7 +37,7 @@
   </div>
   <div class="wrap">
     <table>
-      <thead><tr><th>Date</th><th>Name</th><th>University</th><th>Overall</th><th>Study zone</th><th>Courses</th><th>Comment</th></tr></thead>
+      <thead><tr><th>Date</th><th>Full name</th><th>Phone</th><th>Email</th><th>University</th><th>Major</th><th>Level</th><th>Heard via</th><th>Overall</th><th>Study zone</th><th>Courses</th><th>Recommend</th><th>Comment</th></tr></thead>
       <tbody id="rows"></tbody>
     </table>
   </div>
@@ -66,6 +66,10 @@ async function load() {
   render();
 }
 
+const LEVELS = { y1:'First year', y2:'Second year', y3:'Third year', y4:'Fourth year+', graduate:'Graduate', postgrad:'Postgraduate', other:'Other' };
+const SOURCES = { social:'Social media', friend:'Friend/colleague', university:'University', event:'Event/workshop', other:'Other' };
+const RECS = { yes:'Yes', maybe:'Maybe', no:'No' };
+
 function render() {
   const q = document.getElementById('q').value.toLowerCase();
   const m = document.getElementById('min').value;
@@ -74,13 +78,20 @@ function render() {
   all.filter(r => {
     if (m === '4' && r.overall < 4) return false;
     if (m === '1' && r.overall > 2) return false;
-    return !q || [r.name, r.university, r.comment].some(v => (v || '').toLowerCase().includes(q));
+    return !q || [r.name, r.phone, r.email, r.university, r.major, r.comment].some(v => (v || '').toLowerCase().includes(q));
   }).forEach(r => {
     const tr = document.createElement('tr');
-    [new Date(r.created_at).toLocaleString(), r.name, r.university, r.overall, r.study_zone, r.courses, r.comment].forEach((v, i) => {
+    const cells = [
+      new Date(r.created_at).toLocaleString(), r.name, r.phone, r.email, r.university, r.major,
+      LEVELS[r.study_level], SOURCES[r.heard_about], r.overall, r.study_zone, r.courses,
+      RECS[r.recommend], r.comment
+    ];
+    cells.forEach((v, i) => {
       const td = document.createElement('td');
       td.textContent = v ?? '-';          // textContent = comments can't inject HTML
-      if (i === 6) { td.className = 'comment'; td.dir = 'auto'; }  // Arabic comments align correctly
+      if (i === 2 || i === 3) td.dir = 'ltr';                       // phone and email always read left to right
+      if (i === 12) { td.className = 'comment'; td.dir = 'auto'; }  // Arabic comments align correctly
+      else if (i === 1 || i === 4 || i === 5) td.dir = 'auto';      // Arabic names / universities align correctly
       tr.appendChild(td);
     });
     tbody.appendChild(tr);

@@ -3,36 +3,140 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rate Domains</title>
+  <title>Domains Feedback</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="card">
-    <button id="langBtn" type="button" class="lang">العربية</button>
-    <h1 data-i18n="title"></h1>
-    <p class="sub" data-i18n="subtitle"></p>
+  <main class="page">
+    <header class="top">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">D</span>
+        <div><strong>Domains</strong><small>Sankari holdings</small></div>
+      </div>
+      <button id="langBtn" type="button" class="lang">العربية</button>
+    </header>
 
-    <form id="form">
-      <label><span data-i18n="name"></span>
-        <input name="name" maxlength="80">
-      </label>
-      <label><span data-i18n="university"></span>
-        <input name="university" maxlength="120">
-      </label>
+    <section class="card" id="formCard">
+      <h1 data-i18n="title"></h1>
+      <p class="sub" data-i18n="subtitle"></p>
 
-      <fieldset><legend data-i18n="overall"></legend><div class="stars" data-name="overall"></div></fieldset>
-      <fieldset><legend data-i18n="studyZone"></legend><div class="stars" data-name="study_zone"></div></fieldset>
-      <fieldset><legend data-i18n="courses"></legend><div class="stars" data-name="courses"></div></fieldset>
+      <form id="form" novalidate>
+        <!-- 1. Personal information -->
+        <fieldset class="sec">
+          <legend data-i18n="secPersonal"></legend>
 
-      <label><span data-i18n="comment"></span>
-        <textarea name="comment" rows="4" maxlength="1000"></textarea>
-      </label>
+          <label class="field">
+            <span class="lbl"><span data-i18n="name"></span><b class="req">*</b></span>
+            <input name="name" maxlength="120" autocomplete="name" data-i18n-ph="namePh">
+            <small class="hint" data-i18n="nameHint"></small>
+          </label>
 
-      <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+          <div class="grid">
+            <label class="field">
+              <span class="lbl"><span data-i18n="phone"></span><b class="req">*</b></span>
+              <input name="phone" type="tel" inputmode="tel" dir="ltr" maxlength="20" autocomplete="tel" placeholder="+971 50 123 4567">
+            </label>
+            <label class="field">
+              <span class="lbl"><span data-i18n="email"></span><em class="opt" data-i18n="optional"></em></span>
+              <input name="email" type="email" dir="ltr" maxlength="254" autocomplete="email" placeholder="name@example.com">
+            </label>
+          </div>
 
-      <button type="submit" data-i18n="submit"></button>
-      <p id="msg" role="status"></p>
-    </form>
+          <div class="grid">
+            <label class="field">
+              <span class="lbl"><span data-i18n="university"></span><b class="req">*</b></span>
+              <input name="university" maxlength="120" data-i18n-ph="universityPh">
+            </label>
+            <label class="field">
+              <span class="lbl"><span data-i18n="major"></span><em class="opt" data-i18n="optional"></em></span>
+              <input name="major" maxlength="120" data-i18n-ph="majorPh">
+            </label>
+          </div>
+
+          <div class="grid">
+            <label class="field">
+              <span class="lbl"><span data-i18n="level"></span><b class="req">*</b></span>
+              <select name="study_level">
+                <option value="" data-i18n="choose"></option>
+                <option value="y1" data-i18n="lv_y1"></option>
+                <option value="y2" data-i18n="lv_y2"></option>
+                <option value="y3" data-i18n="lv_y3"></option>
+                <option value="y4" data-i18n="lv_y4"></option>
+                <option value="graduate" data-i18n="lv_graduate"></option>
+                <option value="postgrad" data-i18n="lv_postgrad"></option>
+                <option value="other" data-i18n="lv_other"></option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="lbl"><span data-i18n="heard"></span><em class="opt" data-i18n="optional"></em></span>
+              <select name="heard_about">
+                <option value="" data-i18n="choose"></option>
+                <option value="social" data-i18n="src_social"></option>
+                <option value="friend" data-i18n="src_friend"></option>
+                <option value="university" data-i18n="src_university"></option>
+                <option value="event" data-i18n="src_event"></option>
+                <option value="other" data-i18n="src_other"></option>
+              </select>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- 2. Ratings -->
+        <fieldset class="sec">
+          <legend data-i18n="secExperience"></legend>
+
+          <div class="q">
+            <div class="lbl" id="lbl-overall"><span data-i18n="overall"></span><b class="req">*</b></div>
+            <div class="scale" data-name="overall" data-required="1"><div class="stars" role="radiogroup" aria-labelledby="lbl-overall"></div><span class="scale-text" aria-live="polite"></span></div>
+          </div>
+          <div class="q">
+            <div class="lbl" id="lbl-study"><span data-i18n="studyZone"></span><em class="opt" data-i18n="optional"></em></div>
+            <div class="scale" data-name="study_zone"><div class="stars" role="radiogroup" aria-labelledby="lbl-study"></div><span class="scale-text" aria-live="polite"></span></div>
+          </div>
+          <div class="q">
+            <div class="lbl" id="lbl-courses"><span data-i18n="courses"></span><em class="opt" data-i18n="optional"></em></div>
+            <div class="scale" data-name="courses"><div class="stars" role="radiogroup" aria-labelledby="lbl-courses"></div><span class="scale-text" aria-live="polite"></span></div>
+          </div>
+
+          <div class="q">
+            <div class="lbl" id="lbl-rec"><span data-i18n="recommend"></span><em class="opt" data-i18n="optional"></em></div>
+            <div class="seg" id="recommend" role="radiogroup" aria-labelledby="lbl-rec">
+              <button type="button" role="radio" aria-checked="false" data-value="yes" data-i18n="rec_yes"></button>
+              <button type="button" role="radio" aria-checked="false" data-value="maybe" data-i18n="rec_maybe"></button>
+              <button type="button" role="radio" aria-checked="false" data-value="no" data-i18n="rec_no"></button>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 3. Comments + consent -->
+        <fieldset class="sec">
+          <legend data-i18n="secFeedback"></legend>
+          <label class="field">
+            <span class="lbl"><span data-i18n="comment"></span><em class="opt" data-i18n="optional"></em></span>
+            <textarea name="comment" rows="4" maxlength="1000" data-i18n-ph="commentPh"></textarea>
+          </label>
+
+          <label class="check">
+            <input type="checkbox" name="consent">
+            <span><span data-i18n="consent"></span><b class="req">*</b></span>
+          </label>
+        </fieldset>
+
+        <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+
+        <button type="submit" class="submit" data-i18n="submit"></button>
+        <p id="msg" role="alert"></p>
+      </form>
+    </section>
+
+    <section class="card done" id="thanksCard" hidden>
+      <div class="tick" aria-hidden="true">✓</div>
+      <h1 data-i18n="thanksTitle"></h1>
+      <p class="sub" data-i18n="thanks"></p>
+      <button type="button" class="ghost" id="againBtn" data-i18n="again"></button>
+    </section>
+
+    <footer class="foot" data-i18n="footer"></footer>
   </main>
   <script src="script.js"></script>
 </body>
