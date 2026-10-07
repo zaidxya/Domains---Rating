@@ -4,18 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Domains Feedback</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#38429a">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="page">
-    <header class="top">
+  <header class="hero">
+    <div class="hero-in">
       <div class="brand">
-        <span class="logo" aria-hidden="true">D</span>
-        <div><strong>Domains</strong><small>Sankari holdings</small></div>
+        <img class="mark" src="logo-mark.svg" alt="">
+        <div class="brandtext">
+          <span class="wordmark" dir="ltr">D<svg class="o" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="13" aria-hidden="true"><path d="M13 8V28A37 37 0 0 0 87 28V8"/><path d="M10 94Q50 50 90 94"/></svg>mains</span>
+          <small data-i18n="brandSub"></small>
+        </div>
       </div>
       <button id="langBtn" type="button" class="lang">العربية</button>
-    </header>
+    </div>
+  </header>
 
+  <main class="page">
     <section class="card" id="formCard">
       <h1 data-i18n="title"></h1>
       <p class="sub" data-i18n="subtitle"></p>
@@ -130,6 +137,7 @@
     </section>
 
     <section class="card done" id="thanksCard" hidden>
+      <img class="done-mark" src="logo-mark-color.svg" alt="">
       <div class="tick" aria-hidden="true">✓</div>
       <h1 data-i18n="thanksTitle"></h1>
       <p class="sub" data-i18n="thanks"></p>

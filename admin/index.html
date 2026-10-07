@@ -4,28 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Domains ratings</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <style>
-  :root { --bg:#f4f6fa; --card:#fff; --text:#1c2333; --muted:#6b7385; --accent:#2f5bea; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#12151d; --card:#1b2030; --text:#eef1f8; --muted:#9aa3b8; } }
-  body { margin:0; font-family:system-ui,"Segoe UI",Tahoma,sans-serif; background:var(--bg); color:var(--text); }
-  main { max-width:1400px; margin:1.5rem auto; padding:0 1rem; }
-  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.75rem; }
-  .stat { background:var(--card); border-radius:12px; padding:1rem; text-align:center; }
-  .stat b { display:block; font-size:1.8rem; color:var(--accent); }
+  :root { --navy:#293c88; --navy-deep:#2d3f7c; --violet:#815eea; --bg:#f5f7fb; --card:#fff; --text:#1e2a4a;
+          --muted:#6e7691; --line:#e3e7f1; --brand-grad:linear-gradient(90deg,#815eea 0%,#293c88 100%); }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Tajawal","Segoe UI","Noto Sans Arabic",system-ui,Tahoma,sans-serif; background:var(--bg); color:var(--text); }
+  header { background:var(--brand-grad); color:#fff; padding:.9rem 1.25rem; }
+  .head-in { max-width:1400px; margin:0 auto; display:flex; align-items:center; gap:.75rem; }
+  .head-in img { width:40px; height:40px; }
+  .wordmark { font-family:"Quicksand","Nunito","Segoe UI",system-ui,sans-serif; font-size:1.55rem; font-weight:500; line-height:1.1; }
+  .wordmark .o { width:.62em; height:.62em; margin:0 .04em; vertical-align:-.02em; }
+  .head-in small { display:block; opacity:.8; font-size:.8rem; }
+  main { max-width:1400px; margin:0 auto; padding:1.25rem 1rem 2rem; }
+  h1 { font-size:1.35rem; margin:0 0 .2rem; color:var(--navy-deep); }
+  .lead { color:var(--muted); margin:0 0 1.1rem; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.85rem; }
+  .stat { display:flex; align-items:center; gap:.9rem; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; }
+  .ico { width:42px; height:42px; border-radius:10px; display:grid; place-items:center; flex:none; }
+  .ico svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .t1 { background:#ede9fb; color:#7d49e8; } .t2 { background:#fdeceb; color:#ec7358; }
+  .t3 { background:#eaf8ed; color:#2f9d57; } .t4 { background:#e5e7f0; color:#2d3f7c; }
+  .stat b { display:block; font-size:1.6rem; line-height:1.2; }
   .stat span { color:var(--muted); font-size:.9rem; }
-  .bar { display:flex; gap:.5rem; margin:1rem 0; }
-  .bar input, .bar select { padding:.5rem; border-radius:8px; border:1px solid var(--muted); background:var(--card); color:inherit; font:inherit; }
-  .bar input { flex:1; }
-  .wrap { overflow-x:auto; background:var(--card); border-radius:12px; }
+  .bar { display:flex; gap:.5rem; margin:1.1rem 0; flex-wrap:wrap; }
+  .bar input, .bar select { padding:.6rem .75rem; border-radius:8px; border:1px solid var(--line); background:var(--card); color:inherit; font:inherit; }
+  .bar input { flex:1; min-width:220px; }
+  .bar input:focus, .bar select:focus { outline:2px solid var(--violet); outline-offset:1px; }
+  .wrap { overflow-x:auto; background:var(--card); border:1px solid var(--line); border-radius:12px; }
   table { width:100%; border-collapse:collapse; }
-  th, td { padding:.6rem .75rem; text-align:start; border-bottom:1px solid rgba(128,128,128,.2); vertical-align:top; }
-  th { color:var(--muted); font-size:.85rem; }
+  th, td { padding:.65rem .8rem; text-align:start; border-bottom:1px solid var(--line); vertical-align:top; font-size:.92rem; }
+  th { color:var(--muted); font-size:.82rem; background:var(--bg); white-space:nowrap; font-weight:600; }
+  tbody tr:hover { background:#faf9ff; }
   td.comment { min-width:240px; }
 </style>
 </head>
 <body>
+<header>
+  <div class="head-in">
+    <img src="/logo-mark.svg" alt="">
+    <div>
+      <span class="wordmark" dir="ltr">D<svg class="o" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="13" aria-hidden="true"><path d="M13 8V28A37 37 0 0 0 87 28V8"/><path d="M10 94Q50 50 90 94"/></svg>mains</span>
+      <small>Sankari holdings</small>
+    </div>
+  </div>
+</header>
 <main>
   <h1>Domains ratings</h1>
+  <p class="lead">Overview of the feedback submitted on the rating page</p>
   <div class="stats" id="stats"></div>
   <div class="bar">
     <input id="q" placeholder="Search name, phone, email, university, major, comment...">
@@ -45,6 +71,13 @@
 <script>
 let all = [];
 
+const ICONS = {
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  book: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  cap: '<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>'
+};
+
 async function load() {
   const [stats, rows] = await Promise.all([
     fetch('api/stats').then(r => r.json()),
@@ -53,14 +86,19 @@ async function load() {
   all = rows;
   const box = document.getElementById('stats');
   box.innerHTML = '';
-  [['Ratings', stats.count], ['Overall avg', stats.overall ?? '-'],
-   ['Study zone avg', stats.study_zone ?? '-'], ['Courses avg', stats.courses ?? '-']]
-    .forEach(([label, val]) => {
+  [['Ratings', stats.count, 'users', 't1'], ['Overall avg', stats.overall ?? '-', 'star', 't2'],
+   ['Study zone avg', stats.study_zone ?? '-', 'book', 't3'], ['Courses avg', stats.courses ?? '-', 'cap', 't4']]
+    .forEach(([label, val, icon, tone]) => {
       const d = document.createElement('div');
       d.className = 'stat';
+      const i = document.createElement('div');
+      i.className = 'ico ' + tone;
+      i.innerHTML = '<svg viewBox="0 0 24 24">' + ICONS[icon] + '</svg>';   // icons are fixed strings above, no user data
+      const t = document.createElement('div');
       const b = document.createElement('b'); b.textContent = val;
       const s = document.createElement('span'); s.textContent = label;
-      d.append(b, s);
+      t.append(b, s);
+      d.append(i, t);
       box.appendChild(d);
     });
   render();
