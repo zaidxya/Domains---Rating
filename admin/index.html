@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Domains ratings</title>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.png" type="image/png">
 <style>
   :root { --navy:#293c88; --navy-deep:#2d3f7c; --violet:#815eea; --bg:#f5f7fb; --card:#fff; --text:#1e2a4a;
           --muted:#6e7691; --line:#e3e7f1; --brand-grad:linear-gradient(90deg,#815eea 0%,#293c88 100%); }
@@ -12,10 +12,8 @@
   body { margin:0; font-family:"Tajawal","Segoe UI","Noto Sans Arabic",system-ui,Tahoma,sans-serif; background:var(--bg); color:var(--text); }
   header { background:var(--brand-grad); color:#fff; padding:.9rem 1.25rem; }
   .head-in { max-width:1400px; margin:0 auto; display:flex; align-items:center; gap:.75rem; }
-  .head-in img { width:40px; height:40px; }
-  .wordmark { font-family:"Quicksand","Nunito","Segoe UI",system-ui,sans-serif; font-size:1.55rem; font-weight:500; line-height:1.1; }
-  .wordmark .o { width:.62em; height:.62em; margin:0 .04em; vertical-align:-.02em; }
-  .head-in small { display:block; opacity:.8; font-size:.8rem; }
+  .logo-img { height:36px; width:auto; display:block; }
+  .head-title { margin-inline-start:auto; font-weight:600; opacity:.9; }
   main { max-width:1400px; margin:0 auto; padding:1.25rem 1rem 2rem; }
   h1 { font-size:1.35rem; margin:0 0 .2rem; color:var(--navy-deep); }
   .lead { color:var(--muted); margin:0 0 1.1rem; }
@@ -42,11 +40,8 @@
 <body>
 <header>
   <div class="head-in">
-    <img src="/logo-mark.svg" alt="">
-    <div>
-      <span class="wordmark" dir="ltr">D<svg class="o" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="13" aria-hidden="true"><path d="M13 8V28A37 37 0 0 0 87 28V8"/><path d="M10 94Q50 50 90 94"/></svg>mains</span>
-      <small>Sankari holdings</small>
-    </div>
+    <img class="logo-img" src="/logo-white.png" alt="Domains">
+    <span class="head-title">Ratings dashboard</span>
   </div>
 </header>
 <main>

@@ -26,9 +26,9 @@ domains-rating/
 ├── public/            Public site, served at /
 │   ├── index.html     The rating form
 │   ├── style.css      Styling in the Domains brand colours (RTL-aware)
-│   ├── logo-mark.svg  White logo mark (used on the gradient header)
-│   ├── logo-mark-color.svg  Gradient logo mark (used on white backgrounds)
-│   ├── favicon.svg    Browser-tab icon
+│   ├── logo-white.png Official Domains logo, white, transparent (header)
+│   ├── logo-mark-blue.png  Official logo mark, blue (white backgrounds)
+│   ├── favicon.png, apple-touch-icon.png  Browser-tab / phone icons
 │   └── script.js      Translations, star widgets, language toggle, form submit
 └── admin/             Dashboard, served at /admin (password protected)
     └── index.html     Stats cards, searchable table of all ratings
@@ -40,7 +40,7 @@ domains-rating/
 
 Colours were sampled from the Domains platform dashboard: header gradient `#815eea` (violet) to `#293c88` (navy), navy `#2d3f7c`, violet `#7d49e8`, blue `#4183cc`, page background `#f5f7fb`. They are defined as CSS variables at the top of `public/style.css` and the `<style>` block in `admin/index.html`.
 
-The logo files in `public/` are an SVG redraw of the logo mark, not the official files. To use the official logo, replace `public/logo-mark.svg` (white version), `public/logo-mark-color.svg` and `public/favicon.svg` with your own files under the same names.
+The logo files in `public/` were cut out of the official Domains logo image (PNG, transparent background). If you get the official SVG files, swap them in by replacing `logo-white.png` and `logo-mark-blue.png` (and update the file names in `index.html` and `admin/index.html`).
 
 ## How it works
 

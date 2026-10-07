@@ -1,6 +1,5 @@
 const T = {
   en: {
-    brandSub: 'Sankari holdings',
     title: 'Domains Feedback Form',
     subtitle: 'Your feedback helps Domains, a Sankari holdings initiative, keep connecting university life with the job market.',
     secPersonal: 'Personal information', secExperience: 'Your experience', secFeedback: 'Additional feedback',
@@ -32,7 +31,6 @@ const T = {
     other_lang: 'العربية'
   },
   ar: {
-    brandSub: 'سنكري القابضة',
     title: 'نموذج تقييم دومينز',
     subtitle: 'تساعدنا ملاحظاتك في مبادرة دومينز من سنكري القابضة على مواصلة ربط الحياة الجامعية بسوق العمل.',
     secPersonal: 'المعلومات الشخصية', secExperience: 'تجربتك مع دومينز', secFeedback: 'ملاحظات إضافية',

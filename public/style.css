@@ -14,13 +14,7 @@ body { margin:0; background:var(--bg); color:var(--text); line-height:1.5;
 /* ---------- Header band ---------- */
 .hero { background:var(--brand-grad); color:#fff; padding:1rem 1rem 5.5rem; }
 .hero-in { max-width:720px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:1rem; }
-.brand { display:flex; align-items:center; gap:.75rem; }
-.mark { width:42px; height:42px; display:block; }
-.brandtext { display:flex; flex-direction:column; line-height:1.15; }
-.wordmark { font-family:"Quicksand","Nunito","Segoe UI",system-ui,sans-serif; font-size:1.65rem; font-weight:500;
-  letter-spacing:.01em; direction:ltr; unicode-bidi:isolate; }
-.wordmark .o { width:.62em; height:.62em; margin:0 .04em; vertical-align:-.02em; }
-.brandtext small { opacity:.8; font-size:.8rem; }
+.logo-img { height:38px; width:auto; max-width:62vw; display:block; }
 .lang { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.55); color:#fff; border-radius:8px;
   padding:.4rem .9rem; cursor:pointer; font:inherit; font-size:.9rem; }
 .lang:hover { background:rgba(255,255,255,.22); }
